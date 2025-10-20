@@ -1,0 +1,37 @@
+.github/workflows/eas-build.yml
+name: Build Android APK with EAS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install -g eas-cli && npm ci
+
+      - name: Login to Expo
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas whoami || eas login --token $I4m3pXACT8PoCgRXrHpjT6rWdqectaLHbn1w_gZi
+        Add secret
+
+      - name: Build Android APK
+        run: eas build -p android --profile preview --non-interactive
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurora-tv-channel-apk
+          path: ./build
